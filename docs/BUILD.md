@@ -42,7 +42,7 @@ RootHide 构建使用公开的 `<roothide.h>`、`jbroot()` 与 `jbrand()`，三�
 
 ## 隐根存储
 
-本次交付以 RootHide 包（`iphoneos-arm64e`）为准；普通 rootless/rootful 选项仅供其他环境从源码构建，不能用它们满足隐根存储要求。
+Releases 同时提供 RootHide 包（`iphoneos-arm64e`）与普通 rootless 包（`iphoneos-arm64`）。隐根存储要求仅由 RootHide 方案提供；无根包采用 `/var/jb` 安装布局及普通偏好域，已通过本机构建和包检查，尚未真机验证。rootful 仅保留源码构建选项。
 
 - 已安装资源：通过当前 RootHide API 定位 `Library/PreferenceBundles/TDNPrefs.bundle` 和控制中心 bundle。
 - 自定义图片：`<当前第二隐根>/var/mobile/Library/Touch-Dan`。

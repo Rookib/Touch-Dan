@@ -4,9 +4,20 @@
 
 Touch-Dan 是面向 iOS 的中文触摸可视化插件，用触点与轨迹说明点击、拖动和录屏操作。它是 [OwnGoal Studio / Touch-Viz](https://github.com/owngoal-dev/Touch-Viz) 的独立 MIT 分支，保留上游版权与第三方许可，不代表上游官方版本。
 
-**这是注入 SpringBoard 的系统插件，需要匹配的越狱环境。** 本次交付为 RootHide 隐根版，已在 iOS 16.0.2 真机验证安装、加载、设置共享和文件落点。iOS 17、长时间使用与完整录屏场景仍待验证。
+**这是注入 SpringBoard 的系统插件，需要匹配的越狱环境。** 提供 RootHide 隐根版和普通 rootless 无根版。隐根版已在 iOS 16.0.2 真机验证安装、加载、设置共享和文件落点；无根版已通过构建及安装包检查，尚未真机验证。iOS 17、长时间使用与完整录屏场景仍待验证。
 
 项目：[suckdrygod/Touch-Dan](https://github.com/suckdrygod/Touch-Dan) · 包名：`io.github.suckdrygod.touchdan` · 开发版本：`0.1.0`
+
+## 下载安装包
+
+从 [GitHub Releases](https://github.com/suckdrygod/Touch-Dan/releases) 下载适合当前越狱环境的一个包。文件名中的架构后缀用于区分安装方案，请按越狱环境选择。
+
+| 安装包 | 适用环境 | 验证状态 |
+| --- | --- | --- |
+| `Touch-Dan_0.1.0_roothide_iphoneos-arm64e.deb` | RootHide 隐根 | iOS 16.0.2 安装、加载与目录核验通过 |
+| `Touch-Dan_0.1.0_rootless_iphoneos-arm64.deb` | 普通 rootless 无根 | 构建及包检查通过，未真机验证 |
+
+无根包使用 `/var/jb` 安装布局和普通偏好域，不提供 RootHide 的隐根隔离保证。控制中心按钮需要兼容的 CCSupport；该按钮的完整交互仍待验证。发布附件中的 `SHA256SUMS.txt` 可用于核验下载文件。
 
 ## 本分支的调整
 
@@ -44,7 +55,7 @@ Touch-Dan 是面向 iOS 的中文触摸可视化插件，用触点与轨迹说�
 THEOS="/path/to/theos-roothide" ./devkit/build.sh roothide
 ```
 
-产物写入 `packages/`。这些命令执行 `make clean package`，不安装到设备。本次交付使用 RootHide 包；源码另保留 rootless/rootful 构建选项，它们不满足隐根存储要求。不能仅凭编译通过判断系统兼容。详细环境、版本及 CI 模板说明见 [构建指南](docs/BUILD.md)。
+产物写入 `packages/`。这些命令执行 `make clean package`，不安装到设备。构建普通无根版时使用 `./devkit/build.sh rootless`；源码另保留 rootful 选项。隐根存储要求仅由 RootHide 方案提供，不能仅凭编译通过判断系统兼容。详细环境、版本及 CI 模板说明见 [构建指南](docs/BUILD.md)。
 
 包声明与原 Touch-Viz 的 `com.82flex.touchvis` 冲突，避免两套系统触摸覆盖同时启用。构建命令不执行设备安装或自动发布。
 
