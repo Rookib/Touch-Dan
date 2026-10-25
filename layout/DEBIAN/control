@@ -3,9 +3,9 @@ Name: Touch-Dan
 Version: 0.1.0
 Architecture: iphoneos-arm
 Description: 中文触摸可视化：触点、轨迹与录屏演示预设。基于 Touch-Viz 的 MIT 分支。
-Maintainer: suckdrygod
-Author: suckdrygod, OwnGoal Studio and upstream contributors
-Homepage: https://github.com/suckdrygod/Touch-Dan
+Maintainer: Meiko
+Author: Meiko, OwnGoal Studio and upstream contributors
+Homepage: https://github.com/Rookib/Touch-Dan
 Section: Tweaks
 Depends: firmware (>= 16.0), mobilesubstrate, preferenceloader
 Conflicts: com.82flex.touchvis

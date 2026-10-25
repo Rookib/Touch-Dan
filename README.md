@@ -6,11 +6,11 @@ Touch-Dan 是面向 iOS 的中文触摸可视化插件，用触点与轨迹说�
 
 **这是注入 SpringBoard 的系统插件，需要匹配的越狱环境。** 提供 RootHide 隐根版和普通 rootless 无根版。隐根版已在 iOS 16.0.2 真机验证安装、加载、设置共享和文件落点；无根版已通过构建及安装包检查，尚未真机验证。iOS 17、长时间使用与完整录屏场景仍待验证。
 
-项目：[suckdrygod/Touch-Dan](https://github.com/suckdrygod/Touch-Dan) · 包名：`io.github.suckdrygod.touchdan` · 开发版本：`0.1.0`
+项目：[Rookib/Touch-Dan](https://github.com/Rookib/Touch-Dan) · 包名：`io.github.suckdrygod.touchdan` · 开发版本：`0.1.0`
 
 ## 下载安装包
 
-从 [GitHub Releases](https://github.com/suckdrygod/Touch-Dan/releases) 下载适合当前越狱环境的一个包。文件名中的架构后缀用于区分安装方案，请按越狱环境选择。
+从 [GitHub Releases](https://github.com/Rookib/Touch-Dan/releases) 下载适合当前越狱环境的一个包。文件名中的架构后缀用于区分安装方案，请按越狱环境选择。
 
 | 安装包 | 适用环境 | 验证状态 |
 | --- | --- | --- |
