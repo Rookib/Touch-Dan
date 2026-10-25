@@ -23,23 +23,23 @@ struct TDNRootView: View {
     var useQuickPathEffect = false
 
     @AppStorage("fillColorString", store: TDNUserDefaults.standard)
-    var fillColorString: String = "13,148,136,0.3"
+    var fillColorString: String = "235,59,90,0.5"
     @State var fillColor: Color = .clear
 
     @AppStorage("borderColorString", store: TDNUserDefaults.standard)
-    var borderColorString: String = "13,148,136"
+    var borderColorString: String = "235,59,90"
     @State var borderColor: Color = .clear
 
     @AppStorage("quickPathFillColorString", store: TDNUserDefaults.standard)
-    var quickPathFillColorString: String = "13,148,136,0.3"
+    var quickPathFillColorString: String = "235,59,90,0.5"
     @State var quickPathFillColor: Color = .clear
 
     @AppStorage("trackingFillColorString", store: TDNUserDefaults.standard)
-    var trackingFillColorString: String = "13,148,136,0.12"
+    var trackingFillColorString: String = "235,59,90,0.5"
     @State var trackingFillColor: Color = .clear
 
     @AppStorage("trackingBorderColorString", store: TDNUserDefaults.standard)
-    var trackingBorderColorString: String = "13,148,136,0.3"
+    var trackingBorderColorString: String = "235,59,90"
     @State var trackingBorderColor: Color = .clear
 
     @AppStorage("imageShouldAutoRotate", store: TDNUserDefaults.standard)
@@ -50,19 +50,19 @@ struct TDNRootView: View {
     static let defaultFillImageName = "default.png"
 
     @AppStorage("alpha", store: TDNUserDefaults.standard)
-    var alpha: Double = 0.85
+    var alpha: Double = 0.5
     let minimumAlpha: Double = 0.0
     let maximumAlpha: Double = 1.0
     let alphaStep: Double = 0.01
 
     @AppStorage("fillSize", store: TDNUserDefaults.standard)
-    var fillSize: Double = 26.0
+    var fillSize: Double = 40.0
     let minimumFillSize: Double = 20.0
     let maximumFillSize: Double = 60.0
     let fillSizeStep: Double = 0.1
 
     @AppStorage("borderWidth", store: TDNUserDefaults.standard)
-    var borderWidth: Double = 2.0
+    var borderWidth: Double = 3.0
     let minimumBorderWidth: Double = 0.0
     let maximumBorderWidth: Double = 10.0
     let borderWidthStep: Double = 0.1
@@ -80,7 +80,7 @@ struct TDNRootView: View {
     let animationDurationStep: TimeInterval = 0.1
 
     @AppStorage("liftScale", store: TDNUserDefaults.standard)
-    var liftScale: Double = 1.5
+    var liftScale: Double = 2.0
     let minimumLiftScale: Double = 1.0
     let maximumLiftScale: Double = 5.0
     let liftScaleStep: Double = 0.1
@@ -92,7 +92,6 @@ struct TDNRootView: View {
     var disableOverride: Bool = false
 
     @State var isPresentingResetPrompt = false
-    @State private var lastAppliedPresetName: String?
     @State private var isStorageAvailable = TDNUserDefaults.standard.tdn_canPersistSettings()
     @State var isShowingEnableOverrideHint = false
     @State var isShowingDisableOverrideHint = false
@@ -114,19 +113,19 @@ struct TDNRootView: View {
     }
 
     func reload() {
-        let fillColorString = TDNUserDefaults.standard.string(forKey: "fillColorString") ?? "13,148,136,0.3"
+        let fillColorString = TDNUserDefaults.standard.string(forKey: "fillColorString") ?? "235,59,90,0.5"
         fillColor = Color(rgbString: fillColorString)
 
-        let borderColorString = TDNUserDefaults.standard.string(forKey: "borderColorString") ?? "13,148,136"
+        let borderColorString = TDNUserDefaults.standard.string(forKey: "borderColorString") ?? "235,59,90"
         borderColor = Color(rgbString: borderColorString)
 
-        let quickPathFillColorString = TDNUserDefaults.standard.string(forKey: "quickPathFillColorString") ?? "13,148,136,0.3"
+        let quickPathFillColorString = TDNUserDefaults.standard.string(forKey: "quickPathFillColorString") ?? "235,59,90,0.3"
         quickPathFillColor = Color(rgbString: quickPathFillColorString)
 
-        let trackingFillColorString = TDNUserDefaults.standard.string(forKey: "trackingFillColorString") ?? "13,148,136,0.12"
+        let trackingFillColorString = TDNUserDefaults.standard.string(forKey: "trackingFillColorString") ?? "235,59,90,0.2"
         trackingFillColor = Color(rgbString: trackingFillColorString)
 
-        let trackingBorderColorString = TDNUserDefaults.standard.string(forKey: "trackingBorderColorString") ?? "13,148,136,0.3"
+        let trackingBorderColorString = TDNUserDefaults.standard.string(forKey: "trackingBorderColorString") ?? "235,59,90,0.4"
         trackingBorderColor = Color(rgbString: trackingBorderColorString)
 
         fillImage = Bundle.tdn_fillImageNamed(imageFillName)
@@ -147,61 +146,17 @@ struct TDNRootView: View {
         Section {
             VStack(alignment: .leading, spacing: 4) {
                 Text(NSLocalizedString("Touch-Dan", bundle: Bundle.tdn_support, comment: ""))
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .font(.system(size: 42))
                     .fontWeight(.bold)
                     .foregroundColor(TDN_COLOR)
 
-                Text(String(format: NSLocalizedString("v%@ · suckdrygod", bundle: Bundle.tdn_support, comment: ""), Bundle.tdn_packageVersion))
+                Text(String(format: NSLocalizedString("v%@ - @Rookib", bundle: Bundle.tdn_support, comment: ""), Bundle.tdn_packageVersion))
                     .font(.body)
                     .fontWeight(.medium)
                     .foregroundColor(.secondary)
-                Text(NSLocalizedString("Make every touch easy to follow.", bundle: Bundle.tdn_support, comment: ""))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .padding(.top, 4)
             }
         }
         .listRowBackground(Color.clear)
-    }
-
-    var presetsSection: some View {
-        Section {
-            ForEach(TDNStylePreset.allCases) { preset in
-                Button {
-                    preset.apply(to: TDNUserDefaults.standard)
-                    reload()
-                    reloadOverrides()
-                    lastAppliedPresetName = NSLocalizedString(preset.title, bundle: Bundle.tdn_support, comment: "")
-                    feedbackGenerator.notificationOccurred(.success)
-                } label: {
-                    HStack(spacing: 12) {
-                        LabelWithSubtitle(
-                            NSLocalizedString(preset.title, bundle: Bundle.tdn_support, comment: ""),
-                            subtitle: NSLocalizedString(preset.subtitle, bundle: Bundle.tdn_support, comment: ""),
-                            systemImage: preset.symbol
-                        )
-                        Spacer(minLength: 0)
-                        Image(systemName: "arrow.down.circle")
-                            .imageScale(.medium)
-                            .accessibilityHidden(true)
-                    }
-                    .foregroundColor(TDN_COLOR)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityHint(NSLocalizedString("Apply this style.", bundle: Bundle.tdn_support, comment: ""))
-            }
-        } header: {
-            Text(NSLocalizedString("Style Presets", bundle: Bundle.tdn_support, comment: ""))
-        } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                if let lastAppliedPresetName {
-                    Text(String(format: NSLocalizedString("Last applied: %@", bundle: Bundle.tdn_support, comment: ""), lastAppliedPresetName))
-                        .foregroundColor(TDN_COLOR)
-                }
-                Text(NSLocalizedString("Apply a style, then fine-tune below. Your enable switch and saved images are kept.", bundle: Bundle.tdn_support, comment: ""))
-            }
-        }
     }
 
     var generalSection: some View {
@@ -622,7 +577,7 @@ struct TDNRootView: View {
             }
         } footer: {
             Text(String(format: "%@\n\n%@",
-                NSLocalizedString("Touch-Dan by suckdrygod. Based on Touch-Viz by OwnGoal Studio.\nOriginal work © 2024–2026 OwnGoal Studio (MIT License).", bundle: Bundle.tdn_support, comment: ""),
+                NSLocalizedString("Touch-Dan by Rookib. Based on Touch-Viz by OwnGoal Studio.\nOriginal work © 2024–2026 OwnGoal Studio (MIT License).", bundle: Bundle.tdn_support, comment: ""),
                 NSLocalizedString("Credits:\nLeoNatan / Joe Blau: LNTouchVisualizer (MIT)\nIvan Izyumkin: MCEmojiPicker (MIT)\nTimber Software: SwiftUI Introspect (MIT)", bundle: Bundle.tdn_support, comment: "")))
                 .padding(.bottom, 8)
         }
@@ -640,7 +595,6 @@ struct TDNRootView: View {
                 }
                 withAnimation {
                     TDNUserDefaults.standard.resetToDefaultValues()
-                    lastAppliedPresetName = nil
                     reload()
                     reloadOverrides()
                 }
@@ -652,7 +606,6 @@ struct TDNRootView: View {
         Form {
             header
             generalSection
-            presetsSection
             colorsSection
             alphaSection
             fillSizeSection

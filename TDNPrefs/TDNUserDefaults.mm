@@ -49,23 +49,23 @@ static NSString *const kRootHidePreferencesPath = @"/var/mobile/Library/Preferen
         @"isEnabled" : @NO,
         @"isRecordingOnly" : @NO,
 
-        @"fillColorString" : @"13,148,136,0.3",
-        @"borderColorString" : @"13,148,136",
+        @"fillColorString" : @"235,59,90,0.5",
+        @"borderColorString" : @"235,59,90",
 
-        @"alpha" : @0.85,
-        @"fillSize" : @26.0,
-        @"borderWidth" : @2.0,
+        @"alpha" : @0.5,
+        @"fillSize" : @40.0,
+        @"borderWidth" : @3.0,
         @"cornerRadius" : @30.0,
         @"animationDuration" : @0.3,
-        @"liftScale" : @1.5,
+        @"liftScale" : @2.0,
 
         @"useQuickPathEffect" : @NO,
-        @"quickPathFillColorString" : @"13,148,136,0.3",
+        @"quickPathFillColorString" : @"235,59,90,0.5",
 
         @"useMorphEffect" : @NO,
-        @"useTrackingEffect" : @NO,
-        @"trackingFillColorString" : @"13,148,136,0.12",
-        @"trackingBorderColorString" : @"13,148,136,0.3",
+        @"useTrackingEffect" : @YES,
+        @"trackingFillColorString" : @"235,59,90,0.2",
+        @"trackingBorderColorString" : @"235,59,90,0.4",
 
         @"useImageEffect" : @NO,
         @"imageShouldAutoRotate" : @NO,

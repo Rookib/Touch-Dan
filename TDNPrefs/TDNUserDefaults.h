@@ -2,7 +2,7 @@
 
 #define tdnBool(key) [[TDNUserDefaults standardUserDefaults] boolForKey:key]
 #define TDN_NOTIFY_NAME "io.github.suckdrygod.touchdan.reload-prefs"
-#define TDN_COLOR [UIColor colorWithRed:13.0 / 255 green:148.0 / 255 blue:136.0 / 255 alpha:1.0]
+#define TDN_COLOR [UIColor colorWithRed:235.0 / 255 green:59.0 / 255 blue:90.0 / 255 alpha:1.0]
 
 NS_ASSUME_NONNULL_BEGIN
 

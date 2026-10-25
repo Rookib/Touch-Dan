@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
         Check(d != nil, @"defaults object initialized");
         Check(TDNTestProviderCalls > 0, @"production initialization calls fixture provider");
         Check([d tdn_canPersistSettings] == !unavailable, @"initial write eligibility");
-        Check([d integerForKey:@"fillSize"] == 26 && ![d boolForKey:@"isEnabled"], @"registered defaults loaded");
+        Check([d integerForKey:@"fillSize"] == 40 && ![d boolForKey:@"isEnabled"], @"registered defaults loaded");
 
         if ([scenario isEqualToString:@"valid"]) {
             SetAllKinds(d);
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
             [d removeObjectForKey:@"testObject"];
             Check([d objectForKey:@"testObject"] == nil, @"removeObject removes accepted value");
             [d resetToDefaultValues];
-            Check([d integerForKey:@"fillSize"] == 26 && ![d boolForKey:@"isEnabled"] &&
+            Check([d integerForKey:@"fillSize"] == 40 && ![d boolForKey:@"isEnabled"] &&
                   [[d objectForKey:@"imageFillName"] isEqual:@"default.png"], @"reset restores registered defaults");
             [d synchronize];
         } else if ([scenario isEqualToString:@"changed"]) {

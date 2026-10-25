@@ -1,6 +1,6 @@
 import SwiftUI
 
-let TDN_UICOLOR = UIColor(red: 13.0 / 255, green: 148.0 / 255, blue: 136.0 / 255, alpha: 1.0)
+let TDN_UICOLOR = UIColor(red: 235.0 / 255, green: 59.0 / 255, blue: 90.0 / 255, alpha: 1.0)
 let TDN_COLOR = Color(TDN_UICOLOR)
 
 extension Color {

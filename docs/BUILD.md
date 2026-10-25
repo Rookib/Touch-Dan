@@ -1,8 +1,8 @@
 # 构建 Touch-Dan
 
-本指南只描述手动构建，不安装、重启或修改设备。构建结果与运行兼容性分别记录；真机状态见 [TESTING.md](TESTING.md)。
+本指南只描述手动构建，不安装、重启或修改设备。4.2 的本次构建与界面变更见 [4.2-VALIDATION.md](4.2-VALIDATION.md)。构建结果与运行兼容性分别记录；真机状态见 [TESTING.md](TESTING.md)。
 
-最后一次本机 RootHide 完整构建已通过，并已在 iPhone15,2 / iOS 16.0.2 / RootHide 上安装 Touch-Dan 0.1.0，确认 SpringBoard 与设置面板加载，以及隐根图片、偏好落盘和跨进程读取。iOS 17、长时间运行、真实录屏、多指与旋转等场景仍待验证，详见 [TESTING.md](TESTING.md)。
+历史 0.1.0 的本机 RootHide 完整构建已通过，并已在 iPhone15,2 / iOS 16.0.2 / RootHide 上安装 Touch-Dan 0.1.0，确认 SpringBoard 与设置面板加载，以及隐根图片、偏好落盘和跨进程读取。iOS 17、长时间运行、真实录屏、多指与旋转等场景仍待验证，详见 [TESTING.md](TESTING.md)。
 
 ## 环境
 
@@ -58,7 +58,7 @@ RootHide 的主隐根与 `/var` 的第二隐根可能通过符号链接关联，
 
 ## 包和组件
 
-- 包：`io.github.suckdrygod.touchdan`，当前开发版本 `0.1.0`。
+- 包：`io.github.suckdrygod.touchdan`，当前版本 `4.2`。
 - SpringBoard 插件：`TouchDan`。
 - 设置面板：`TDNPrefs`。
 - 控制中心模块：`CCTouchDan`。
