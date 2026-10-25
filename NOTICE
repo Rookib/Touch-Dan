@@ -1,0 +1,45 @@
+Touch-Dan — third-party notices
+
+Touch-Dan is an independent fork of Touch-Viz by OwnGoal Studio.
+Upstream: https://github.com/owngoal-dev/Touch-Viz
+Base commit: 435876b232bf2584d5d2535ffa22e94b736cf32d
+Upstream copyright: Copyright (c) 2024-2026 OwnGoal Studio
+The complete upstream MIT license is preserved, unchanged, in LICENSE.
+The Touch-Dan name does not imply endorsement by the upstream authors.
+
+Included third-party components:
+
+LNTouchVisualizer (adapted under TDNTouchVisualizer/)
+https://github.com/LeoNatan/LNTouchVisualizer
+Copyright (c) 2021 Leo Natan
+Copyright (c) 2014 Joe Blau <josephblau@gmail.com>
+Full MIT license: LICENSES/LNTouchVisualizer-MIT.txt
+Existing source-file attribution notices remain applicable.
+
+MCEmojiPicker (prebuilt frameworks under TDNPrefs/Frameworks/)
+https://github.com/izyumkin/MCEmojiPicker
+Copyright (c) 2022 Ivan Izyumkin
+Full MIT license: LICENSES/MCEmojiPicker-MIT.txt
+
+SwiftUIIntrospect (prebuilt frameworks under TDNPrefs/Frameworks/)
+https://github.com/siteline/swiftui-introspect
+Copyright 2019 Timber Software
+Full MIT license: LICENSES/SwiftUIIntrospect-MIT.txt
+
+libroot (adapted helper source under libroot/)
+https://github.com/opa334/libroot
+Copyright (c) 2024 Lars Fröder
+Full MIT license: LICENSES/libroot-MIT.txt
+
+The settings and Control Center icons are the original Touch-Viz resources,
+restored byte-for-byte from the upstream base commit named above.
+TVZPrefs/Resources maps to TDNPrefs/Resources, and CCTouchViz/Resources maps
+to CCTouchDan/Resources. These inherited icons retain the upstream copyright
+and MIT license notices. Touch-Dan branding does not change their authorship.
+
+The precise source revisions of the inherited prebuilt MCEmojiPicker and
+SwiftUIIntrospect binaries are unknown. Their generic bundle version fields
+are not a verified dependency version. See docs/THIRD_PARTY.md for provenance,
+license retrieval sources, and the distinction between source and binary records.
+The current source tree and build packages exclude the proprietary RevealServer
+framework. The GitHub fork retains the upstream commit history.

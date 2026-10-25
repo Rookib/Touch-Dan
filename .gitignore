@@ -2,6 +2,7 @@
 .theos/
 .DS_Store
 packages/
+/work/
 compile_commands.json
 
 # Created by https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
@@ -138,4 +139,5 @@ iOSInjectionProject/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,macos,xcode
-n
+# Generated notices are embedded in the preference bundle at build time.
+TDNPrefs/Resources/Licenses/

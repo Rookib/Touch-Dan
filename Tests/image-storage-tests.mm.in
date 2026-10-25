@@ -1,0 +1,87 @@
+// File I/O regression tests against the production NSBundle category.
+// UIImage is only a placeholder; no UIKit rendering or device behavior is tested.
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "NSBundle+TDNPrefs.h"
+#include <sys/stat.h>
+#include <unistd.h>
+static NSString *root;
+NSString *TDNTestRoot(void) { return root; }
+@implementation UIImage
++ (instancetype)imageNamed:(NSString *)name inBundle:(NSBundle *)bundle compatibleWithTraitCollection:(id)traits {
+    UIImage *image = [UIImage new]; image.sourcePath = @"bundle-default"; return image;
+}
++ (instancetype)imageWithContentsOfFile:(NSString *)path {
+    if (![NSFileManager.defaultManager fileExistsAtPath:path]) return nil;
+    UIImage *image = [UIImage new]; image.sourcePath = path; return image;
+}
+@end
+NSData *UIImagePNGRepresentation(UIImage *image) { return [@"mock-image-data" dataUsingEncoding:NSUTF8StringEncoding]; }
+#define CHECK(c) do { if (!(c)) { NSLog(@"FAIL line %d: %s", __LINE__, #c); return 1; } } while (0)
+static NSString *managed(NSString *extension) { return [NSString stringWithFormat:@"%@.%@",NSUUID.UUID.UUIDString,extension]; }
+int main(int argc, char **argv) { @autoreleasepool {
+    NSFileManager *fm=NSFileManager.defaultManager;
+    NSString *base=[NSString stringWithUTF8String:argv[1]];
+    CHECK([fm createDirectoryAtPath:base withIntermediateDirectories:YES attributes:nil error:nil]);
+    NSString *source=[base stringByAppendingPathComponent:@"source.png"];
+    CHECK([[@"source-bytes" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:source options:0 error:nil]);
+    root=nil; CHECK([NSBundle tdn_saveFillImageWithPath:source]==nil); CHECK(![NSBundle tdn_removeAllFillImages]);
+    root=@""; CHECK([NSBundle tdn_saveFillImageWithPath:source]==nil);
+    root=@"relative-root"; CHECK([NSBundle tdn_saveFillImageWithPath:source]==nil);
+    root=[base stringByAppendingPathComponent:@"missing-root"];
+    CHECK([NSBundle tdn_saveFillImageWithPath:[base stringByAppendingPathComponent:@"missing.png"]]==nil);
+    CHECK(![fm fileExistsAtPath:root]);
+    root=[base stringByAppendingPathComponent:@"blocking-file"];
+    CHECK([[@"block" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:root options:0 error:nil]);
+    CHECK([NSBundle tdn_saveFillImageWithPath:source]==nil);
+    NSString *outside=[base stringByAppendingPathComponent:@"outside"];
+    CHECK([fm createDirectoryAtPath:outside withIntermediateDirectories:YES attributes:nil error:nil]);
+    root=[base stringByAppendingPathComponent:@"symlink-root"];
+    CHECK([fm createSymbolicLinkAtPath:root withDestinationPath:outside error:nil]);
+    CHECK([NSBundle tdn_saveFillImageWithPath:source]==nil);
+    CHECK([fm contentsOfDirectoryAtPath:outside error:nil].count==0);
+    root=[base stringByAppendingPathComponent:@"hidden-root-images"];
+    NSString *a=[NSBundle tdn_saveFillImageWithPath:source]; CHECK(a!=nil);
+    NSString *b=[NSBundle tdn_saveFillImageWithImage:[UIImage new]]; CHECK(b!=nil); CHECK(![a isEqualToString:b]);
+    CHECK([fm contentsOfDirectoryAtPath:root error:nil].count==2);
+    NSString *ap=[root stringByAppendingPathComponent:a], *bp=[root stringByAppendingPathComponent:b];
+    CHECK([[NSData dataWithContentsOfFile:ap] isEqualToData:[NSData dataWithContentsOfFile:source]]);
+    NSDate *date=[NSDate dateWithTimeIntervalSince1970:1000];
+    CHECK([fm setAttributes:@{NSFileModificationDate:date} ofItemAtPath:ap error:nil]);
+    CHECK([fm setAttributes:@{NSFileModificationDate:date} ofItemAtPath:bp error:nil]);
+    CHECK([[[NSBundle tdn_fillImageNamed:a] sourcePath] isEqualToString:ap]);
+    CHECK([[[NSBundle tdn_fillImageNamed:b] sourcePath] isEqualToString:bp]);
+    CHECK([[[NSBundle tdn_fillImageNamed:[@"../" stringByAppendingString:a]] sourcePath] isEqualToString:@"bundle-default"]);
+    CHECK(![NSBundle tdn_removeUnusedFillImagesKeeping:[@"../" stringByAppendingString:b]]);
+    NSString *foreign=[root stringByAppendingPathComponent:@"keep-me.txt"];
+    CHECK([[@"foreign" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:foreign options:0 error:nil]);
+    NSString *directory=[root stringByAppendingPathComponent:managed(@"png")];
+    CHECK([fm createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:nil]);
+    NSString *linked=[root stringByAppendingPathComponent:managed(@"png")];
+    CHECK([fm createSymbolicLinkAtPath:linked withDestinationPath:source error:nil]);
+    NSString *oldStage=[root stringByAppendingPathComponent:[@".touchdan-tmp-" stringByAppendingString:NSUUID.UUID.UUIDString]];
+    NSString *newStage=[root stringByAppendingPathComponent:[@".touchdan-tmp-" stringByAppendingString:NSUUID.UUID.UUIDString]];
+    CHECK([[@"old" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:oldStage options:0 error:nil]);
+    CHECK([[@"new" dataUsingEncoding:NSUTF8StringEncoding] writeToFile:newStage options:0 error:nil]);
+    CHECK([fm setAttributes:@{NSFileModificationDate:date} ofItemAtPath:oldStage error:nil]);
+    CHECK([NSBundle tdn_removeUnusedFillImagesKeeping:b]);
+    CHECK(![fm fileExistsAtPath:ap]); CHECK([fm fileExistsAtPath:bp]); CHECK([fm fileExistsAtPath:foreign]);
+    CHECK([fm fileExistsAtPath:directory]); CHECK([fm fileExistsAtPath:source]); CHECK(![fm fileExistsAtPath:linked]);
+    CHECK(![fm fileExistsAtPath:oldStage]); CHECK([fm fileExistsAtPath:newStage]);
+    if (geteuid() != 0) {
+        CHECK(chmod(root.fileSystemRepresentation,0500)==0);
+        CHECK([NSBundle tdn_saveFillImageWithPath:source]==nil);
+        CHECK(![NSBundle tdn_removeAllFillImages]);
+        CHECK(chmod(root.fileSystemRepresentation,0700)==0);
+    } else {
+        NSLog(@"SKIP permission-denial assertions when running as root.");
+    }
+    CHECK([NSBundle tdn_removeAllFillImages]);
+    CHECK(![fm fileExistsAtPath:bp]); CHECK(![fm fileExistsAtPath:newStage]);
+    CHECK([fm fileExistsAtPath:foreign]); CHECK([fm fileExistsAtPath:directory]);
+    CHECK([fm removeItemAtPath:foreign error:nil]); CHECK([fm removeItemAtPath:directory error:nil]);
+    CHECK([NSBundle tdn_removeAllFillImages]); CHECK(![fm fileExistsAtPath:root]);
+    CHECK([NSBundle tdn_removeAllFillImages]);
+    NSLog(@"PASS: fail-closed roots, staging, cache identity, bounded cleanup, permissions, reset.");
+    return 0;
+} }

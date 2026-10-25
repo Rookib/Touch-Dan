@@ -2,7 +2,7 @@
 tasks = ["interfaces", "code", "normalize"]
 
 [update.interfaces]
-paths = ["TVZPrefs"]
+paths = ["TDNPrefs"]
 subpathsToIgnore = [".git", "carthage", "pods", "build", ".build", "docs", "MCEmojiPicker.bundle"]
 defaultToBase = false
 ignoreEmptyStrings = false
@@ -10,9 +10,9 @@ unstripped = false
 ignoreKeys = ["#bartycrouch-ignore!", "#bc-ignore!", "#i!"]
 
 [update.code]
-codePaths = ["TVZPrefs"]
+codePaths = ["TDNPrefs"]
 subpathsToIgnore = [".git", "carthage", "pods", "build", ".build", "docs", "MCEmojiPicker.bundle"]
-localizablePaths = ["TVZPrefs"]
+localizablePaths = ["TDNPrefs"]
 defaultToKeys = false
 additive = false
 customFunction = "LocalizedStringResource"
@@ -22,7 +22,7 @@ ignoreKeys = ["#bartycrouch-ignore!", "#bc-ignore!", "#i!"]
 overrideComments = false
 
 [update.normalize]
-paths = ["TVZPrefs"]
+paths = ["TDNPrefs"]
 subpathsToIgnore = [".git", "carthage", "pods", "build", ".build", "docs", "MCEmojiPicker.bundle"]
 sourceLocale = "en"
 harmonizeWithSource = true
@@ -30,7 +30,7 @@ sortByKeys = true
 separateWithEmptyLine = true
 
 [lint]
-paths = ["TVZPrefs"]
+paths = ["TDNPrefs"]
 subpathsToIgnore = [".git", "carthage", "pods", "build", ".build", "docs", "MCEmojiPicker.bundle"]
 duplicateKeys = true
 emptyValues = true

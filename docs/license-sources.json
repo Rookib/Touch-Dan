@@ -1,0 +1,31 @@
+{
+  "retrievedOn": "2026-10-26",
+  "method": "Official project repositories, fetched via connected GitHub tool",
+  "note": "Full license text preserved; source URLs do not identify the exact revision of inherited binary dependencies.",
+  "licenses": [
+    {
+      "component": "LNTouchVisualizer",
+      "file": "LICENSES/LNTouchVisualizer-MIT.txt",
+      "sourceURL": "https://github.com/LeoNatan/LNTouchVisualizer/blob/master/LICENSE",
+      "sha256": "5f7cc846c455290151710ad9d6efe2fda0753436ce7ebeed91dab0075d8ba323"
+    },
+    {
+      "component": "MCEmojiPicker",
+      "file": "LICENSES/MCEmojiPicker-MIT.txt",
+      "sourceURL": "https://github.com/izyumkin/MCEmojiPicker/blob/main/LICENSE",
+      "sha256": "f0b2be1ed7e25ea9f686ce1109fa3f2196b8a3496793a7f1cc701f3464efe391"
+    },
+    {
+      "component": "SwiftUIIntrospect",
+      "file": "LICENSES/SwiftUIIntrospect-MIT.txt",
+      "sourceURL": "https://github.com/siteline/swiftui-introspect/blob/main/LICENSE",
+      "sha256": "6b641dab66ef6541385f83164a22caf087c51c8212b930008fb39a3b877fbffd"
+    },
+    {
+      "component": "libroot",
+      "file": "LICENSES/libroot-MIT.txt",
+      "sourceURL": "https://github.com/opa334/libroot/blob/main/LICENSE.md",
+      "sha256": "381eb52c09afd77dd3be504500ef991035b0eb320be4aa6c6d1c6ee4e279e413"
+    }
+  ]
+}

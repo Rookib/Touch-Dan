@@ -2,5 +2,5 @@
 
 cd "$(dirname "$0")"/.. || exit
 
-plutil -convert xml1 CCTouchViz/Resources/Info.plist
-plutil -convert xml1 TVZPrefs/Resources/Info.plist
+plutil -convert xml1 CCTouchDan/Resources/Info.plist
+plutil -convert xml1 TDNPrefs/Resources/Info.plist

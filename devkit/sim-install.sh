@@ -1,27 +1,5 @@
 #!/bin/sh
-
-if [ -z "$THEOS_DEVICE_SIMULATOR" ]; then
-  exit 0
-fi
-
-cd "$(dirname "$0")"/.. || exit
-
-TWEAK_NAME=TouchViz
-
-sudo rm -rf /opt/simject/RevealServer.framework
-sudo cp -v -R "$PWD/Frameworks/_Simulator/RevealServer.framework" /opt/simject/
-sudo codesign -f -s - /opt/simject/RevealServer.framework/RevealServer
-
-sudo rm -f "/opt/simject/$TWEAK_NAME.dylib"
-sudo cp -v "$THEOS_OBJ_DIR/$TWEAK_NAME.dylib" "/opt/simject/$TWEAK_NAME.dylib"
-sudo codesign -f -s - "/opt/simject/$TWEAK_NAME.dylib"
-sudo cp -v "$PWD/$TWEAK_NAME.plist" /opt/simject
-
-BUNDLE_NAME="TVZPrefs"
-
-sudo rm -rf "/opt/simject/PreferenceBundles/$BUNDLE_NAME.bundle"
-sudo cp -rv "$THEOS_OBJ_DIR/$BUNDLE_NAME.bundle" "/opt/simject/PreferenceBundles/$BUNDLE_NAME.bundle"
-sudo codesign -f -s - "/opt/simject/PreferenceBundles/$BUNDLE_NAME.bundle"
-sudo cp -rv "$PWD/$BUNDLE_NAME/layout/Library/PreferenceLoader/Preferences/$BUNDLE_NAME" /opt/simject/PreferenceLoader/Preferences/
-
-resim
+# Simulator deployment is deliberately separate from builds.
+printf '%s\n' 'Touch-Dan does not install into or restart the Simulator during a build.'
+printf '%s\n' 'Use a dedicated test environment for SpringBoard injection; see README.md.'
+exit 1

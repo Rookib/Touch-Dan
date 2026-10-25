@@ -1,0 +1,45 @@
+# Optional: copy to .github/workflows/build.yml to enable GitHub Actions.
+name: Touch-Dan packages
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [rootful, rootless, roothide]
+    env:
+      THEOS: ${{ github.workspace }}/.toolchain/theos
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '16.4'
+      - uses: actions/checkout@v4
+        with:
+          repository: roothide/theos
+          ref: 88506b2c22e9e07dd4ed055f23c9e398a117a2c7
+          path: .toolchain/theos
+          submodules: recursive
+      - name: Install build dependencies
+        run: brew install ldid xz
+      - name: Install iOS SDK
+        run: "$THEOS/bin/install-sdk iPhoneOS16.5"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run host lifecycle tests
+        run: python3 Tests/run-lifecycle-tests.py
+      - name: Build package
+        run: devkit/build.sh "${{ matrix.variant }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: touch-dan-${{ matrix.variant }}
+          path: packages/*.deb
+          if-no-files-found: error

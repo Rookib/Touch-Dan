@@ -1,0 +1,320 @@
+// Production method bodies are inserted by run-lifecycle-tests.py.
+// Foundation mocks deliberately do not claim to test UIKit or a real device.
+#import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
+#include <math.h>
+#include <stdio.h>
+
+#define HBLogDebug(...) ((void)0)
+static NSUInteger checks = 0;
+static NSUInteger animationCalls = 0;
+static const NSTimeInterval TOUCH_VISUALIZER_ZERO_DELAY = 0;
+static const NSTimeInterval TOUCH_VISUALIZER_WINDOW_REMOVE_DELAY = 6;
+#define CHECK(condition, name) do { checks++; if (!(condition)) { \
+    fprintf(stderr, "FAIL: %s\n", name); return 1; } } while (0)
+
+typedef NS_ENUM(NSInteger, UITouchPhase) {
+    UITouchPhaseBegan, UITouchPhaseMoved, UITouchPhaseStationary,
+    UITouchPhaseEnded, UITouchPhaseCancelled, UITouchPhaseRegionEntered,
+    UITouchPhaseRegionMoved, UITouchPhaseRegionExited
+};
+typedef NS_ENUM(NSInteger, UITouchType) { UITouchTypeDirect, UITouchTypeIndirect, UITouchTypePencil };
+
+@interface TestLayer : NSObject
+@property NSUInteger removals;
+- (void)removeAllAnimations;
+@end
+@implementation TestLayer
+- (void)removeAllAnimations { self.removals++; }
+@end
+
+@interface UIView : NSObject
+@property CGPoint center;
+@property CGAffineTransform transform;
+@property CGFloat alpha;
+@property NSInteger tag;
+@property BOOL hidden;
+@property(nonatomic, weak) UIView *superview;
+@property(nonatomic, strong) NSMutableArray<UIView *> *subviews;
+@property(nonatomic, strong) TestLayer *layer;
+- (void)addSubview:(UIView *)view;
+- (UIView *)viewWithTag:(NSInteger)tag;
+- (void)removeFromSuperview;
++ (BOOL)areAnimationsEnabled;
++ (void)setAnimationsEnabled:(BOOL)enabled;
++ (void)animateWithDuration:(NSTimeInterval)duration animations:(void (^)(void))animations;
++ (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(NSUInteger)options
+                 animations:(void (^)(void))animations completion:(void (^)(BOOL))completion;
+@end
+@implementation UIView
+- (instancetype)init {
+    if ((self = [super init])) {
+        _subviews = [NSMutableArray new];
+        _layer = [TestLayer new];
+        _transform = CGAffineTransformIdentity;
+    }
+    return self;
+}
+- (void)addSubview:(UIView *)view { view.superview = self; [self.subviews addObject:view]; }
+- (UIView *)viewWithTag:(NSInteger)tag {
+    for (UIView *view in self.subviews) if (view.tag == tag) return view;
+    return nil;
+}
+- (void)removeFromSuperview { [self.superview.subviews removeObject:self]; self.superview = nil; }
++ (BOOL)areAnimationsEnabled { return YES; }
++ (void)setAnimationsEnabled:(BOOL)enabled {}
++ (void)animateWithDuration:(NSTimeInterval)duration animations:(void (^)(void))animations {
+    animationCalls++; animations();
+}
++ (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay options:(NSUInteger)options
+                 animations:(void (^)(void))animations completion:(void (^)(BOOL))completion {
+    animationCalls++; animations(); if (completion) completion(YES);
+}
+@end
+
+@interface UIWindow : UIView
+@end
+@implementation UIWindow
+@end
+
+@interface UITouch : NSObject
+@property UITouchPhase phase;
+@property UITouchType type;
+@property NSUInteger identity;
+@end
+@implementation UITouch
+- (NSUInteger)hash { return self.identity; }
+@end
+
+@interface UIEvent : NSObject
+@property(nonatomic, copy) NSSet<UITouch *> *allTouches;
+@end
+@implementation UIEvent
+@end
+
+@interface TDNTouchConfig : NSObject
+@property BOOL shouldAutoRotate;
+@property CGFloat liftScale;
+@property NSTimeInterval fadeDuration;
+@property NSTimeInterval morphDuration;
+@end
+@implementation TDNTouchConfig
+@end
+
+@interface TDNTouchImageView : UIView
+@property(getter=isFadingOut) BOOL fadingOut;
+@property BOOL shouldAutomaticallyRemoveAfterTimeout;
+@property NSTimeInterval timestamp;
+@end
+@implementation TDNTouchImageView
+@end
+
+@interface TDNTouchVisualizerWindow : UIWindow
+@property(nonatomic) BOOL quickPathEnabled;
+@property(nonatomic) BOOL morphEnabled;
+@property(nonatomic) BOOL trackingEnabled;
+@property(nonatomic) BOOL touchVisualizationEnabled;
+@property(nonatomic) NSUInteger activeTouchCount;
+@property(nonatomic) BOOL fingerTipRemovalScheduled;
+@property(nonatomic, strong) NSTimer *timer;
+@property(nonatomic, strong) UIWindow *overlayWindow;
+@property(nonatomic, strong) TDNTouchConfig *touchContactConfig;
+@property(nonatomic) NSUInteger pathEndCalls;
+@property(nonatomic) NSUInteger rootReloadCalls;
+@property(nonatomic) NSUInteger markerUpdates;
+@property(nonatomic) NSUInteger removalScheduleCalls;
+- (void)reloadRootViewController;
+- (void)tdn_endAllQuickPathTouches;
+- (void)removeInactiveFingerTips;
+- (void)_scheduleFingerTipRemoval;
+- (void)timerFired:(NSTimer *)timer;
+- (CGPoint)locationOfTouch:(UITouch *)touch;
+- (CGAffineTransform)coordinateTransform;
+- (void)_handleTouchMoved:(UITouch *)touch inView:(UIView *)view toCenter:(CGPoint)center withTransform:(CGAffineTransform)transform;
+- (void)_handleTouchStationary:(UITouch *)touch inView:(TDNTouchImageView *)view toCenter:(CGPoint)center
+               withTransform:(CGAffineTransform)transform coordinate:(CGAffineTransform)coordinate;
+- (void)resetTouchVisualization;
+- (BOOL)hasAnyTouch;
+- (void)sendTouchEvent:(UIEvent *)event;
+- (void)_removeFingerTipWithHash:(NSUInteger)hash animated:(BOOL)animated;
+- (void)performMorphWithTouchView:(NSTimer *)timer;
+@end
+
+@implementation TDNTouchVisualizerWindow
+- (UIWindow *)overlayWindow { return _overlayWindow ?: self; }
+- (void)reloadRootViewController { self.rootReloadCalls++; }
+- (void)tdn_endAllQuickPathTouches { self.pathEndCalls++; }
+- (void)_scheduleFingerTipRemoval { self.fingerTipRemovalScheduled = YES; self.removalScheduleCalls++; }
+- (void)timerFired:(NSTimer *)timer {}
+- (CGPoint)locationOfTouch:(UITouch *)touch { return CGPointMake(20, 40); }
+- (CGAffineTransform)coordinateTransform { return CGAffineTransformIdentity; }
+- (void)_handleTouchMoved:(UITouch *)touch inView:(UIView *)view toCenter:(CGPoint)center withTransform:(CGAffineTransform)transform {}
+- (void)_handleTouchStationary:(UITouch *)touch inView:(TDNTouchImageView *)view toCenter:(CGPoint)center
+               withTransform:(CGAffineTransform)transform coordinate:(CGAffineTransform)coordinate {
+    self.markerUpdates++;
+    if (!view) {
+        view = [TDNTouchImageView new];
+        view.tag = touch.hash;
+        [self.overlayWindow addSubview:view];
+    }
+}
+/* @WINDOW_METHODS@ */
+@end
+
+@interface UIWindowScene : NSObject
+@property(nonatomic, strong) TDNTouchVisualizerWindow *tdn_touchVisualizerWindow;
+@property(nonatomic) BOOL tdn_touchVisualizerEnabled;
+@end
+@implementation UIWindowScene
+/* @SCENE_METHODS@ */
+@end
+
+@interface SBReachabilityManager : NSObject
+@property BOOL reachabilityModeActive;
++ (instancetype)sharedInstance;
+@end
+@implementation SBReachabilityManager
++ (instancetype)sharedInstance {
+    static SBReachabilityManager *manager;
+    if (!manager) manager = [self new];
+    return manager;
+}
+@end
+
+static TDNTouchVisualizerWindow *_gWindow;
+static UIWindowScene *_gWindowScene;
+static BOOL captured;
+static BOOL IsAnyScreenInRecording(void) { return captured; }
+/* @GLOBALS@ */
+/* @STATE_FUNCTIONS@ */
+/* @BLOCK_LAYOUT@ */
+/* @BLOCK_FUNCTION@ */
+
+static UITouch *Touch(NSUInteger identity, UITouchPhase phase, UITouchType type) {
+    UITouch *touch = [UITouch new]; touch.identity = identity; touch.phase = phase; touch.type = type; return touch;
+}
+static UIEvent *Event(NSArray<UITouch *> *touches) {
+    UIEvent *event = [UIEvent new]; event.allTouches = [NSSet setWithArray:touches]; return event;
+}
+static NSTimer *Timer(TDNTouchVisualizerWindow *window, id userInfo) {
+    return [NSTimer timerWithTimeInterval:30 target:window selector:@selector(timerFired:) userInfo:userInfo repeats:YES];
+}
+
+int main(void) {
+  @autoreleasepool {
+    _gWindow = [TDNTouchVisualizerWindow new];
+    _gWindow.touchContactConfig = [TDNTouchConfig new];
+    _gWindow.touchContactConfig.fadeDuration = 0.3;
+    _gWindow.touchContactConfig.liftScale = 2;
+    _gWindowScene = [UIWindowScene new];
+    _gWindowScene.tdn_touchVisualizerWindow = _gWindow;
+    _gEnabled = YES;
+    _gEnabledOnlyWhenRecording = YES;
+    _gQuickPathRequested = _gMorphRequested = _gTrackingRequested = YES;
+    ReloadStats();
+    CHECK(!_gWindowScene.tdn_touchVisualizerEnabled, "recording-only starts hidden");
+    CHECK(!_gWindow.quickPathEnabled && !_gWindow.morphEnabled && !_gWindow.trackingEnabled, "effects suspended before recording");
+    captured = YES; ReloadStats();
+    CHECK(_gWindowScene.tdn_touchVisualizerEnabled, "recording enables visualization");
+    CHECK(_gWindow.quickPathEnabled && _gWindow.morphEnabled && _gWindow.trackingEnabled, "recording restores all requested effects");
+    SBReachabilityManager.sharedInstance.reachabilityModeActive = YES;
+    ReloadStats();
+    CHECK(!_gWindowScene.tdn_touchVisualizerEnabled, "reachability suspends visualization");
+    SBReachabilityManager.sharedInstance.reachabilityModeActive = NO;
+    ReloadStats();
+    CHECK(_gWindow.quickPathEnabled && _gWindow.morphEnabled && _gWindow.trackingEnabled, "reachability exit restores effects");
+    _gIsBroadcasting = YES; ReloadStats();
+    CHECK(!_gWindowScene.tdn_touchVisualizerEnabled, "excluded broadcast hides indicators");
+    captured = NO; ReloadStats();
+    CHECK(!_gIsBroadcasting, "capture stop clears broadcast state");
+    _gEnableOverride = YES; _gTrackingRequested = NO; ReloadStats();
+    CHECK(_gWindowScene.tdn_touchVisualizerEnabled && _gWindow.quickPathEnabled && !_gWindow.trackingEnabled, "override restores only requested effects");
+
+    UITouch *first = Touch(11, UITouchPhaseBegan, UITouchTypeDirect);
+    [_gWindow sendTouchEvent:Event(@[first])];
+    CHECK([_gWindow hasAnyTouch] && _gWindow.activeTouchCount == 1, "began touch counted active");
+    TDNTouchImageView *marker = (id)[_gWindow viewWithTag:first.hash];
+    NSTimer *timer = Timer(_gWindow, marker); _gWindow.timer = timer;
+    first.phase = UITouchPhaseEnded;
+    [_gWindow sendTouchEvent:Event(@[first])];
+    CHECK(![_gWindow hasAnyTouch], "nonempty ended event is no longer active");
+    CHECK(!_gWindow.timer && !timer.valid, "last ended touch cancels morph timer");
+    _gEnabled = NO;
+    CHECK(!ShouldKeepSystemGestureTouchStreamSending(), "ended event cannot keep disabled gesture stream alive");
+    _gEnabled = YES;
+
+    UITouch *second = Touch(22, UITouchPhaseMoved, UITouchTypeDirect);
+    UITouch *pencil = Touch(33, UITouchPhaseMoved, UITouchTypePencil);
+    UITouch *hover = Touch(44, UITouchPhaseRegionMoved, UITouchTypeDirect);
+    [_gWindow sendTouchEvent:Event(@[first, second, pencil, hover])];
+    CHECK(_gWindow.activeTouchCount == 1, "mixed phases and input types count only active direct touch");
+    second.phase = UITouchPhaseCancelled;
+    [_gWindow sendTouchEvent:Event(@[second])];
+    CHECK(![_gWindow hasAnyTouch], "cancelled final touch is inactive");
+    NSUInteger updates = _gWindow.markerUpdates;
+    [_gWindow sendTouchEvent:Event(@[Touch(99, UITouchPhaseEnded, UITouchTypeDirect)])];
+    CHECK(_gWindow.markerUpdates == updates && ![_gWindow viewWithTag:99], "unseen ended touch does not create marker");
+
+    UIView *unrelated = [UIView new]; [_gWindow addSubview:unrelated];
+    TDNTouchImageView *cleanupMarker = [TDNTouchImageView new]; [_gWindow addSubview:cleanupMarker];
+    _gWindow.activeTouchCount = 2;
+    _gWindow.fingerTipRemovalScheduled = YES;
+    timer = Timer(_gWindow, cleanupMarker); _gWindow.timer = timer;
+    NSUInteger pathEnds = _gWindow.pathEndCalls;
+    _gWindow.touchVisualizationEnabled = NO;
+    CHECK(![_gWindow hasAnyTouch] && !_gWindow.timer && !timer.valid, "disable clears active state and timer");
+    CHECK(!_gWindow.fingerTipRemovalScheduled && !cleanupMarker.superview, "disable clears pending marker removal and views");
+    CHECK(cleanupMarker.layer.removals == 1 && unrelated.superview == _gWindow, "cleanup cancels marker animations and preserves unrelated views");
+    CHECK(_gWindow.pathEndCalls == pathEnds + 1, "disable ends QuickPath touches");
+    [_gWindow sendTouchEvent:Event(@[Touch(77, UITouchPhaseBegan, UITouchTypeDirect)])];
+    CHECK(![_gWindow hasAnyTouch], "disabled visualization ignores new events");
+
+    _gWindow.quickPathEnabled = YES; pathEnds = _gWindow.pathEndCalls;
+    _gWindow.quickPathEnabled = NO;
+    CHECK(_gWindow.pathEndCalls == pathEnds + 1, "disabling QuickPath ends existing paths");
+    _gWindow.quickPathEnabled = NO;
+    CHECK(_gWindow.pathEndCalls == pathEnds + 1, "unchanged QuickPath state is idempotent");
+    timer = Timer(_gWindow, nil); _gWindow.timer = timer;
+    _gWindow.morphEnabled = NO;
+    CHECK(!_gWindow.timer && !timer.valid, "disabling morph cancels timer");
+
+    _gWindow.touchVisualizationEnabled = YES; _gWindow.morphEnabled = YES;
+    timer = Timer(_gWindow, nil); _gWindow.timer = timer;
+    NSUInteger animationsBefore = animationCalls;
+    [_gWindow performMorphWithTouchView:timer];
+    CHECK(!_gWindow.timer && !timer.valid && animationCalls == animationsBefore, "stale morph callback cannot animate with no active touch");
+    CHECK(BlockSig(nil) == nil, "nil broadcast completion is safe");
+    void (^completion)(NSError *) = ^(NSError *error) {};
+    CHECK([BlockSig(completion) isEqualToString:@"v16@?0@\"NSError\"8"], "valid completion retains exact block type encoding");
+    UIWindowScene *emptyScene = [UIWindowScene new];
+    CHECK(!emptyScene.tdn_touchVisualizerEnabled, "missing scene window is disabled");
+
+    TDNTouchVisualizerWindow *idleWindow = [TDNTouchVisualizerWindow new];
+    idleWindow.touchContactConfig = _gWindow.touchContactConfig;
+    UIView *hostingView = [UIView new]; [idleWindow addSubview:hostingView];
+    [idleWindow removeInactiveFingerTips];
+    CHECK(!idleWindow.fingerTipRemovalScheduled && idleWindow.removalScheduleCalls == 0,
+          "permanent QuickPath hosting view does not keep cleanup polling alive");
+    TDNTouchImageView *liveMarker = [TDNTouchImageView new];
+    liveMarker.tag = 701; liveMarker.shouldAutomaticallyRemoveAfterTimeout = YES;
+    liveMarker.timestamp = NSProcessInfo.processInfo.systemUptime;
+    [idleWindow addSubview:liveMarker];
+    [idleWindow removeInactiveFingerTips];
+    CHECK(idleWindow.fingerTipRemovalScheduled && idleWindow.removalScheduleCalls == 1,
+          "live expiring marker schedules its next cleanup check");
+    liveMarker.timestamp -= 10;
+    [idleWindow removeInactiveFingerTips];
+    CHECK(liveMarker.isFadingOut && !idleWindow.fingerTipRemovalScheduled && idleWindow.removalScheduleCalls == 1,
+          "expired fading marker uses its removal callback without polling");
+    [liveMarker removeFromSuperview];
+    TDNTouchImageView *ripple = [TDNTouchImageView new];
+    [idleWindow addSubview:ripple];
+    [idleWindow removeInactiveFingerTips];
+    CHECK(!idleWindow.fingerTipRemovalScheduled && idleWindow.removalScheduleCalls == 1,
+          "self-removing ripple does not keep cleanup polling alive");
+    [idleWindow resetTouchVisualization];
+    [_gWindow resetTouchVisualization];
+    printf("PASS: %lu lifecycle checks using production method bodies and Foundation mocks. No UIKit/device validation.\n", (unsigned long)checks);
+  }
+  return 0;
+}

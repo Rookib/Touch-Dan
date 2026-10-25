@@ -1,9 +1,11 @@
-Package: com.82flex.touchvis
-Name: Touch-Viz
-Version: 4.2
+Package: io.github.suckdrygod.touchdan
+Name: Touch-Dan
+Version: 0.1.0
 Architecture: iphoneos-arm
-Description: Display your touch interactions!
-Maintainer: Lessica <82flex@gmail.com>
-Author: Lessica <82flex@gmail.com>
+Description: 中文触摸可视化：触点、轨迹与录屏演示预设。基于 Touch-Viz 的 MIT 分支。
+Maintainer: suckdrygod
+Author: suckdrygod, OwnGoal Studio and upstream contributors
+Homepage: https://github.com/suckdrygod/Touch-Dan
 Section: Tweaks
-Depends: firmware (>= 15.0), mobilesubstrate, preferenceloader
+Depends: firmware (>= 16.0), mobilesubstrate, preferenceloader
+Conflicts: com.82flex.touchvis

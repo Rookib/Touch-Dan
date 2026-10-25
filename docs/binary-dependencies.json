@@ -1,0 +1,70 @@
+{
+  "inheritedFrom": {
+    "repository": "https://github.com/owngoal-dev/Touch-Viz",
+    "commit": "435876b232bf2584d5d2535ffa22e94b736cf32d"
+  },
+  "sourceVersions": "Unknown; generic bundle version 1.0 is not a verified dependency release version.",
+  "rebuiltInThisFork": false,
+  "artifacts": [
+    {
+      "component": "MCEmojiPicker",
+      "file": "TDNPrefs/Frameworks/MCEmojiPicker.xcframework/ios-arm64_arm64e/MCEmojiPicker.framework/MCEmojiPicker",
+      "sha256": "35f839a2f8b6930adae6161096896a57b55524ba2d64a01c2200252961a2dcd6",
+      "bytes": 5667112,
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "platform": "ios",
+      "platformVariant": null,
+      "bundleShortVersion": "1.0",
+      "bundleVersion": "1",
+      "verifiedSourceVersion": null
+    },
+    {
+      "component": "SwiftUIIntrospect",
+      "file": "TDNPrefs/Frameworks/SwiftUIIntrospect.xcframework/ios-arm64_arm64e/SwiftUIIntrospect.framework/SwiftUIIntrospect",
+      "sha256": "8f99389f1d1e5212c9dba809c0d34739e8fa385477ed03b4dda4961c410654a1",
+      "bytes": 8074856,
+      "architectures": [
+        "arm64",
+        "arm64e"
+      ],
+      "platform": "ios",
+      "platformVariant": null,
+      "bundleShortVersion": "1.0",
+      "bundleVersion": "1",
+      "verifiedSourceVersion": null
+    },
+    {
+      "component": "MCEmojiPicker",
+      "file": "TDNPrefs/Frameworks/_Simulator/MCEmojiPicker.xcframework/ios-arm64_x86_64-simulator/MCEmojiPicker.framework/MCEmojiPicker",
+      "sha256": "d8dd1b80a67234f1f1a6b63ce60afd5766da684ee0eeabf046483efbaa9dc35e",
+      "bytes": 6661048,
+      "architectures": [
+        "arm64",
+        "x86_64"
+      ],
+      "platform": "ios",
+      "platformVariant": "simulator",
+      "bundleShortVersion": "1.0",
+      "bundleVersion": "1",
+      "verifiedSourceVersion": null
+    },
+    {
+      "component": "SwiftUIIntrospect",
+      "file": "TDNPrefs/Frameworks/_Simulator/SwiftUIIntrospect.xcframework/ios-arm64_x86_64-simulator/SwiftUIIntrospect.framework/SwiftUIIntrospect",
+      "sha256": "8c23e170ab4bf886a30300188dc549cbb4a6927b32341e5762872ba45e51ca11",
+      "bytes": 8179408,
+      "architectures": [
+        "arm64",
+        "x86_64"
+      ],
+      "platform": "ios",
+      "platformVariant": "simulator",
+      "bundleShortVersion": "1.0",
+      "bundleVersion": "1",
+      "verifiedSourceVersion": null
+    }
+  ]
+}
